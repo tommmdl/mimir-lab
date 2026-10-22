@@ -1,0 +1,58 @@
+name: Testa tenants e recuperação no Mimir
+on:
+  push:
+    branches: [main]
+    paths: ['config/**', 'cluster/**', 'manifests/**', 'scripts/**', 'kustomization.yaml', '.github/workflows/**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  mimir:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          path: mimir-lab
+          persist-credentials: false
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+        with:
+          repository: tommmdl/kubernetes-lab
+          ref: 457f8b92a40c55aa05c2f3c75b8972c1c8f84ed4
+          path: kubernetes-lab
+          persist-credentials: false
+      - name: Prepara as ferramentas
+        working-directory: kubernetes-lab
+        run: bash scripts/prepare.sh
+      - name: Sobe o ambiente isolado
+        working-directory: mimir-lab
+        run: bash scripts/lab.sh up
+      - name: Testa consultas, persistência e falhas
+        working-directory: mimir-lab
+        run: python3 scripts/test.py
+      - name: Guarda diagnóstico sem credenciais
+        if: always()
+        working-directory: mimir-lab
+        run: |
+          mkdir -p .local
+          {
+            bash scripts/k.sh -n mimir-lab get pods,pvc
+            bash scripts/k.sh -n mimir-lab get events --sort-by=.metadata.creationTimestamp
+            for name in mimir prometheus-a prometheus-b blackbox grafana; do
+              bash scripts/k.sh -n mimir-lab logs "deployment/$name" --tail=30
+            done
+          } > .local/diagnostics.log 2>&1 || true
+      - uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
+        if: always()
+        with:
+          name: mimir-results
+          path: |
+            mimir-lab/evidence/test-*.json
+            mimir-lab/.local/diagnostics.log
+          include-hidden-files: true
+          retention-days: 14
+      - name: Remove somente o cluster do runner
+        if: always()
+        working-directory: kubernetes-lab
+        run: .local/bin/kind delete cluster --name devops-sre

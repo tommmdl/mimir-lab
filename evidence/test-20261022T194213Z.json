@@ -1,0 +1,333 @@
+{
+  "started_at": "2026-10-22T19:40:20.353892+00:00",
+  "status": "passed",
+  "checks": [
+    {
+      "check": "healthy-tenant-a",
+      "status": "passed",
+      "evidence": [
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "healthz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/healthz",
+            "job": "notes-http",
+            "tenant_origin": "a"
+          },
+          "value": [
+            1792698026.427,
+            "1"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "readyz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/readyz",
+            "job": "notes-http",
+            "tenant_origin": "a"
+          },
+          "value": [
+            1792698026.427,
+            "1"
+          ]
+        }
+      ]
+    },
+    {
+      "check": "healthy-tenant-b",
+      "status": "passed",
+      "evidence": [
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "healthz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/healthz",
+            "job": "notes-http",
+            "tenant_origin": "b"
+          },
+          "value": [
+            1792698026.437,
+            "1"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "readyz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/readyz",
+            "job": "notes-http",
+            "tenant_origin": "b"
+          },
+          "value": [
+            1792698026.437,
+            "1"
+          ]
+        }
+      ]
+    },
+    {
+      "check": "retention-configured-not-expiration-tested",
+      "status": "passed",
+      "configured_value": "1d"
+    },
+    {
+      "check": "tenant-a-does-not-contain-b",
+      "status": "passed",
+      "evidence": []
+    },
+    {
+      "check": "tenant-b-does-not-contain-a",
+      "status": "passed",
+      "evidence": []
+    },
+    {
+      "check": "tenant-header-required",
+      "status": "passed",
+      "http_status": 401
+    },
+    {
+      "check": "grafana-proxy-tenant-a",
+      "status": "passed",
+      "evidence": [
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "healthz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/healthz",
+            "job": "notes-http",
+            "tenant_origin": "a"
+          },
+          "value": [
+            1792698026.691,
+            "1"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "readyz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/readyz",
+            "job": "notes-http",
+            "tenant_origin": "a"
+          },
+          "value": [
+            1792698026.691,
+            "1"
+          ]
+        }
+      ]
+    },
+    {
+      "check": "grafana-proxy-tenant-b",
+      "status": "passed",
+      "evidence": [
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "healthz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/healthz",
+            "job": "notes-http",
+            "tenant_origin": "b"
+          },
+          "value": [
+            1792698026.724,
+            "1"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "readyz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/readyz",
+            "job": "notes-http",
+            "tenant_origin": "b"
+          },
+          "value": [
+            1792698026.724,
+            "1"
+          ]
+        }
+      ]
+    },
+    {
+      "check": "historical-sample-before-restart",
+      "status": "passed",
+      "evidence": [
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "healthz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/healthz",
+            "job": "notes-http",
+            "tenant_origin": "a"
+          },
+          "value": [
+            1792698026.744,
+            "1"
+          ]
+        }
+      ]
+    },
+    {
+      "check": "mimir-pvc-history-with-writer-stopped",
+      "status": "passed",
+      "evidence": [
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "healthz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/healthz",
+            "job": "notes-http",
+            "tenant_origin": "a"
+          },
+          "value": [
+            1792698054.219,
+            "1"
+          ]
+        }
+      ]
+    },
+    {
+      "check": "writer-a-recovered",
+      "status": "passed",
+      "evidence": [
+        {
+          "metric": {
+            "__name__": "up",
+            "instance": "localhost:9090",
+            "job": "prometheus"
+          },
+          "value": [
+            1792698061.365,
+            "1"
+          ]
+        }
+      ]
+    },
+    {
+      "check": "api-outage-arrives-in-mimir",
+      "status": "passed",
+      "evidence": [
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "healthz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/healthz",
+            "job": "notes-http",
+            "tenant_origin": "a"
+          },
+          "value": [
+            1792698066.909,
+            "0"
+          ]
+        },
+        {
+          "metric": {
+            "__name__": "probe_success",
+            "endpoint": "readyz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/readyz",
+            "job": "notes-http",
+            "tenant_origin": "a"
+          },
+          "value": [
+            1792698066.909,
+            "0"
+          ]
+        }
+      ]
+    },
+    {
+      "check": "api-recovery-arrives-in-mimir",
+      "status": "passed",
+      "evidence": true
+    },
+    {
+      "check": "remote-write-retried-during-outage",
+      "status": "passed",
+      "evidence": [
+        {
+          "metric": {},
+          "value": [
+            1792698105.622,
+            "8600"
+          ]
+        }
+      ]
+    },
+    {
+      "check": "remote-write-backfilled-outage-window",
+      "status": "passed",
+      "evidence": [
+        {
+          "metric": {
+            "endpoint": "healthz",
+            "instance": "http://notes-api.notes-lab.svc.cluster.local/healthz",
+            "job": "notes-http",
+            "tenant_origin": "a"
+          },
+          "value": [
+            1792698130.262,
+            "4"
+          ]
+        }
+      ]
+    }
+  ],
+  "findings": [],
+  "remote_write_outage": {
+    "start_epoch": 1792698080.6184046,
+    "end_epoch": 1792698105.6185148,
+    "query": "count_over_time(probe_success{job=\"notes-http\",endpoint=\"healthz\"}[20s] @ 1792698103.6185148)"
+  },
+  "cleanup": [
+    {
+      "deployment": "notes-api",
+      "restored_replicas": 2
+    },
+    {
+      "deployment": "mimir",
+      "restored_replicas": 1
+    },
+    {
+      "deployment": "prometheus-a",
+      "restored_replicas": 1
+    }
+  ],
+  "source_sha256": {
+    "config/blackbox.yaml": "96ff0ca554650ba70c4171acf01f892ea53e96a5df12d87b00362416cc5fcdd0",
+    "config/dashboard.json": "9f63cf7d58b55293bdf70bf624916a333c1809fd1d5eb5f9a7f2848447fb009b",
+    "config/dashboards.yaml": "eb5739571c6d184bf673eaec5e6b2ff8b962925b1e3186ec6585691dd7f2618d",
+    "config/datasources.yaml": "409c9faa367a0a69a688ce250f4ecd98236bec8089d8c67bd741a8539c75f495",
+    "config/images.json": "b11ea86fa1fe67a076610ef93012fa54b11b2dc2e70406524de3fdacd960d76b",
+    "config/mimir.yaml": "3261b6cf0d0ae0e9b7f2c4cdbaa59afbd2c2ad1769d8ea9a1d77f0af20a06e5a",
+    "config/prometheus-a.yaml": "9ae1d64cd184f04f0f56a54fb5eeff090930fbd5975023ac99ae92790054bd50",
+    "config/prometheus-b.yaml": "ac3ba0faef517cc1de67e25832e6ec1a77915687ebb3c75861872a19104edd6e",
+    "config/upstream.json": "69cd6f0fdec1e1fadbb370acb1bbdf084f6dfaff879d36d3f5bc41be0d1af25d",
+    "scripts/access.sh": "32e05a46498c3d8b186e9defbdfeb53858e7e2af56bede40aa90d348d277cc18",
+    "scripts/k.sh": "e7ef2bb60f2eb6d02024fc852b85cb82ddf9e2797fcf5872d0694508e73c77c0",
+    "scripts/lab.sh": "cf9adea1b00bb38dc75b20889323dd56b25d24b2876aee0302275fce5ac11aff",
+    "scripts/render.py": "c7f3980a864cc8811e676bf48d8e709dba1ca1fb0d4b8cdeaf7e5597b728d244",
+    "scripts/test.py": "bebe58b783c67463fcacbe00bee2285ec4bb141ca77ac1b2e9011e42d5b240cf",
+    "manifests/stack.json": "0a7a67d5f940bb4da827ae619a5605548c9d2a6ef3cc1d56c23d2463f192a966"
+  },
+  "images": {
+    "prometheus": {
+      "tag": "prom/prometheus:v3.15.0",
+      "pinned": "prom/prometheus@sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e"
+    },
+    "blackbox": {
+      "tag": "prom/blackbox-exporter:v0.29.0",
+      "pinned": "prom/blackbox-exporter@sha256:9613f2884689b6fad9f1939f6a3b0388c93a022cfaededb19545b329b5c83dea"
+    },
+    "grafana": {
+      "tag": "grafana/grafana:13.2.4",
+      "pinned": "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+    },
+    "mimir": {
+      "tag": "grafana/mimir:3.2.3",
+      "pinned": "grafana/mimir@sha256:0ed56db7d7713707eff00224ddd4c3096afa6cf1cbe43a6f9391c537f1416099"
+    }
+  },
+  "finished_at": "2026-10-22T19:42:13.318161+00:00"
+}

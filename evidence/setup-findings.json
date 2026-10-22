@@ -1,0 +1,24 @@
+{
+  "findings": [
+    {
+      "stage": "config-check",
+      "error": "-verify-config flag is not supported by Mimir 3.2.3",
+      "resolution": "Validate using actual startup; no successful preflight claimed."
+    },
+    {
+      "stage": "initial-startup",
+      "error": "Non-root process could not create ./metrics-activity.log in image working directory",
+      "resolution": "Move the activity tracker file into the writable /data PVC; retain non-root execution."
+    },
+    {
+      "stage": "application-startup",
+      "observation": "API restarted while PostgreSQL was initializing",
+      "resolution": "Deployment script now waits for PostgreSQL before applying the API."
+    },
+    {
+      "stage": "second-startup",
+      "error": "Ruler sanity check still used relative ./data-ruler outside writable data directory",
+      "resolution": "Set Mimir workingDir to /data, keeping UID/GID 10001 and the same PVC."
+    }
+  ]
+}

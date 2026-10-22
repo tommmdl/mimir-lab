@@ -1,0 +1,760 @@
+{
+  "apiVersion": "v1",
+  "kind": "List",
+  "items": [
+    {
+      "apiVersion": "v1",
+      "kind": "Namespace",
+      "metadata": {
+        "name": "mimir-lab"
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "mimir-data"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "2Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "mimir"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "mimir"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "mimir"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 10001,
+              "runAsGroup": 10001,
+              "fsGroup": 10001,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "containers": [
+              {
+                "name": "mimir",
+                "image": "grafana/mimir@sha256:0ed56db7d7713707eff00224ddd4c3096afa6cf1cbe43a6f9391c537f1416099",
+                "args": [
+                  "-config.file=/etc/lab/mimir.yaml",
+                  "-activity-tracker.filepath=/data/metrics-activity.log"
+                ],
+                "ports": [
+                  {
+                    "containerPort": 9009
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "config",
+                    "mountPath": "/etc/lab",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "data",
+                    "mountPath": "/data"
+                  }
+                ],
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "1Gi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "workingDir": "/data",
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/ready",
+                    "port": 9009
+                  },
+                  "periodSeconds": 3,
+                  "failureThreshold": 30
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/ready",
+                    "port": 9009
+                  },
+                  "periodSeconds": 3,
+                  "failureThreshold": 60
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "config",
+                "configMap": {
+                  "name": "mimir-config"
+                }
+              },
+              {
+                "name": "data",
+                "persistentVolumeClaim": {
+                  "claimName": "mimir-data"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "mimir"
+      },
+      "spec": {
+        "selector": {
+          "app": "mimir"
+        },
+        "ports": [
+          {
+            "port": 9009,
+            "targetPort": 9009
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "prometheus-a-data"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "2Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "prometheus-a"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "prometheus-a"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "prometheus-a"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65534,
+              "runAsGroup": 65534,
+              "fsGroup": 65534,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "containers": [
+              {
+                "name": "prometheus-a",
+                "image": "prom/prometheus@sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e",
+                "args": [
+                  "--config.file=/etc/lab/prometheus.yaml",
+                  "--storage.tsdb.path=/data",
+                  "--storage.tsdb.retention.time=2h"
+                ],
+                "ports": [
+                  {
+                    "containerPort": 9090
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "config",
+                    "mountPath": "/etc/lab",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "data",
+                    "mountPath": "/data"
+                  }
+                ],
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/-/ready",
+                    "port": 9090
+                  },
+                  "periodSeconds": 3,
+                  "failureThreshold": 30
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/-/ready",
+                    "port": 9090
+                  },
+                  "periodSeconds": 3,
+                  "failureThreshold": 60
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "config",
+                "configMap": {
+                  "name": "prometheus-a-config"
+                }
+              },
+              {
+                "name": "data",
+                "persistentVolumeClaim": {
+                  "claimName": "prometheus-a-data"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "prometheus-a"
+      },
+      "spec": {
+        "selector": {
+          "app": "prometheus-a"
+        },
+        "ports": [
+          {
+            "port": 9090,
+            "targetPort": 9090
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "prometheus-b-data"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "2Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "prometheus-b"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "prometheus-b"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "prometheus-b"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65534,
+              "runAsGroup": 65534,
+              "fsGroup": 65534,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "containers": [
+              {
+                "name": "prometheus-b",
+                "image": "prom/prometheus@sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e",
+                "args": [
+                  "--config.file=/etc/lab/prometheus.yaml",
+                  "--storage.tsdb.path=/data",
+                  "--storage.tsdb.retention.time=2h"
+                ],
+                "ports": [
+                  {
+                    "containerPort": 9090
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "config",
+                    "mountPath": "/etc/lab",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "data",
+                    "mountPath": "/data"
+                  }
+                ],
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/-/ready",
+                    "port": 9090
+                  },
+                  "periodSeconds": 3,
+                  "failureThreshold": 30
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/-/ready",
+                    "port": 9090
+                  },
+                  "periodSeconds": 3,
+                  "failureThreshold": 60
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "config",
+                "configMap": {
+                  "name": "prometheus-b-config"
+                }
+              },
+              {
+                "name": "data",
+                "persistentVolumeClaim": {
+                  "claimName": "prometheus-b-data"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "prometheus-b"
+      },
+      "spec": {
+        "selector": {
+          "app": "prometheus-b"
+        },
+        "ports": [
+          {
+            "port": 9090,
+            "targetPort": 9090
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "blackbox"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "blackbox"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "blackbox"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 65534,
+              "runAsGroup": 65534,
+              "fsGroup": 65534,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "containers": [
+              {
+                "name": "blackbox",
+                "image": "prom/blackbox-exporter@sha256:9613f2884689b6fad9f1939f6a3b0388c93a022cfaededb19545b329b5c83dea",
+                "args": [
+                  "--config.file=/etc/lab/blackbox.yaml"
+                ],
+                "ports": [
+                  {
+                    "containerPort": 9115
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "config",
+                    "mountPath": "/etc/lab",
+                    "readOnly": true
+                  }
+                ],
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/",
+                    "port": 9115
+                  },
+                  "periodSeconds": 3,
+                  "failureThreshold": 30
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/",
+                    "port": 9115
+                  },
+                  "periodSeconds": 3,
+                  "failureThreshold": 60
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "config",
+                "configMap": {
+                  "name": "blackbox-config"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "blackbox"
+      },
+      "spec": {
+        "selector": {
+          "app": "blackbox"
+        },
+        "ports": [
+          {
+            "port": 9115,
+            "targetPort": 9115
+          }
+        ]
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "PersistentVolumeClaim",
+      "metadata": {
+        "name": "grafana-data"
+      },
+      "spec": {
+        "accessModes": [
+          "ReadWriteOnce"
+        ],
+        "resources": {
+          "requests": {
+            "storage": "2Gi"
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "apps/v1",
+      "kind": "Deployment",
+      "metadata": {
+        "name": "grafana"
+      },
+      "spec": {
+        "replicas": 1,
+        "strategy": {
+          "type": "Recreate"
+        },
+        "selector": {
+          "matchLabels": {
+            "app": "grafana"
+          }
+        },
+        "template": {
+          "metadata": {
+            "labels": {
+              "app": "grafana"
+            }
+          },
+          "spec": {
+            "automountServiceAccountToken": false,
+            "securityContext": {
+              "runAsNonRoot": true,
+              "runAsUser": 472,
+              "runAsGroup": 472,
+              "fsGroup": 472,
+              "seccompProfile": {
+                "type": "RuntimeDefault"
+              }
+            },
+            "containers": [
+              {
+                "name": "grafana",
+                "image": "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f",
+                "args": [],
+                "ports": [
+                  {
+                    "containerPort": 3000
+                  }
+                ],
+                "volumeMounts": [
+                  {
+                    "name": "data",
+                    "mountPath": "/data"
+                  },
+                  {
+                    "name": "datasources",
+                    "mountPath": "/etc/grafana/provisioning/datasources",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "providers",
+                    "mountPath": "/etc/grafana/provisioning/dashboards",
+                    "readOnly": true
+                  },
+                  {
+                    "name": "dashboard",
+                    "mountPath": "/var/lib/grafana/dashboards",
+                    "readOnly": true
+                  }
+                ],
+                "resources": {
+                  "requests": {
+                    "cpu": "100m",
+                    "memory": "128Mi"
+                  },
+                  "limits": {
+                    "cpu": "1",
+                    "memory": "512Mi"
+                  }
+                },
+                "securityContext": {
+                  "allowPrivilegeEscalation": false,
+                  "capabilities": {
+                    "drop": [
+                      "ALL"
+                    ]
+                  }
+                },
+                "env": [
+                  {
+                    "name": "GF_PATHS_DATA",
+                    "value": "/data"
+                  },
+                  {
+                    "name": "GF_SECURITY_ADMIN_PASSWORD",
+                    "valueFrom": {
+                      "secretKeyRef": {
+                        "name": "grafana-admin",
+                        "key": "password"
+                      }
+                    }
+                  },
+                  {
+                    "name": "GF_ANALYTICS_REPORTING_ENABLED",
+                    "value": "false"
+                  },
+                  {
+                    "name": "GF_ANALYTICS_CHECK_FOR_UPDATES",
+                    "value": "false"
+                  }
+                ],
+                "readinessProbe": {
+                  "httpGet": {
+                    "path": "/api/health",
+                    "port": 3000
+                  },
+                  "periodSeconds": 3,
+                  "failureThreshold": 30
+                },
+                "startupProbe": {
+                  "httpGet": {
+                    "path": "/api/health",
+                    "port": 3000
+                  },
+                  "periodSeconds": 3,
+                  "failureThreshold": 60
+                }
+              }
+            ],
+            "volumes": [
+              {
+                "name": "data",
+                "persistentVolumeClaim": {
+                  "claimName": "grafana-data"
+                }
+              },
+              {
+                "name": "datasources",
+                "configMap": {
+                  "name": "grafana-datasources"
+                }
+              },
+              {
+                "name": "providers",
+                "configMap": {
+                  "name": "grafana-providers"
+                }
+              },
+              {
+                "name": "dashboard",
+                "configMap": {
+                  "name": "grafana-dashboard"
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "apiVersion": "v1",
+      "kind": "Service",
+      "metadata": {
+        "name": "grafana"
+      },
+      "spec": {
+        "selector": {
+          "app": "grafana"
+        },
+        "ports": [
+          {
+            "port": 3000,
+            "targetPort": 3000
+          }
+        ]
+      }
+    }
+  ]
+}

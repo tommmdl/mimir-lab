@@ -1,0 +1,79 @@
+{
+  "uid": "mimir-notes",
+  "title": "Notas no Mimir / Notes in Mimir",
+  "schemaVersion": 39,
+  "version": 1,
+  "refresh": "5s",
+  "time": {
+    "from": "now-15m",
+    "to": "now"
+  },
+  "panels": [
+    {
+      "id": 1,
+      "type": "timeseries",
+      "title": "Sondas A / Probes A",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-a"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "probe_success{job=\"notes-http\"}",
+          "legendFormat": "{{endpoint}}"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 24,
+        "h": 8
+      }
+    },
+    {
+      "id": 2,
+      "type": "timeseries",
+      "title": "Sondas B / Probes B",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-b"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "probe_success{job=\"notes-http\"}",
+          "legendFormat": "{{endpoint}}"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 8,
+        "w": 24,
+        "h": 8
+      }
+    },
+    {
+      "id": 3,
+      "type": "timeseries",
+      "title": "Dura\u00e7\u00e3o da sonda / Probe duration",
+      "datasource": {
+        "type": "prometheus",
+        "uid": "mimir-a"
+      },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "probe_duration_seconds{job=\"notes-http\"}",
+          "legendFormat": "{{endpoint}}"
+        }
+      ],
+      "gridPos": {
+        "x": 0,
+        "y": 16,
+        "w": 24,
+        "h": 8
+      }
+    }
+  ]
+}

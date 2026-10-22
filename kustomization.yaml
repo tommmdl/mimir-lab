@@ -1,0 +1,20 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: mimir-lab
+resources:
+  - manifests/stack.json
+configMapGenerator:
+  - name: mimir-config
+    files: [mimir.yaml=config/mimir.yaml]
+  - name: prometheus-a-config
+    files: [prometheus.yaml=config/prometheus-a.yaml]
+  - name: prometheus-b-config
+    files: [prometheus.yaml=config/prometheus-b.yaml]
+  - name: blackbox-config
+    files: [blackbox.yaml=config/blackbox.yaml]
+  - name: grafana-datasources
+    files: [datasources.yaml=config/datasources.yaml]
+  - name: grafana-providers
+    files: [dashboards.yaml=config/dashboards.yaml]
+  - name: grafana-dashboard
+    files: [dashboard.json=config/dashboard.json]

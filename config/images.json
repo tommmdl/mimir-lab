@@ -1,0 +1,18 @@
+{
+  "prometheus": {
+    "tag": "prom/prometheus:v3.15.0",
+    "pinned": "prom/prometheus@sha256:efd719c99d83b060d9daefdcf00360461adf279f45ef5391f8d111892118753e"
+  },
+  "blackbox": {
+    "tag": "prom/blackbox-exporter:v0.29.0",
+    "pinned": "prom/blackbox-exporter@sha256:9613f2884689b6fad9f1939f6a3b0388c93a022cfaededb19545b329b5c83dea"
+  },
+  "grafana": {
+    "tag": "grafana/grafana:13.2.4",
+    "pinned": "grafana/grafana@sha256:dbbc38ea21103cefb50396340cd88afec779c7e070b0a7bf5a75b4ce46651d3f"
+  },
+  "mimir": {
+    "tag": "grafana/mimir:3.2.3",
+    "pinned": "grafana/mimir@sha256:0ed56db7d7713707eff00224ddd4c3096afa6cf1cbe43a6f9391c537f1416099"
+  }
+}
